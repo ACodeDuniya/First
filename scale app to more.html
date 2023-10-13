@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Container Example</title>
+    <style>
+        /* Centering the container */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 40vh;
+            height: 50vh;
+            margin: 0;
+        }
+
+        /* Styling the container */
+        .container {
+            width: 400px; /* Adjust the width as needed */
+            padding: 20px;
+            border: 1px solid  grey;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+        /* Optional: Style for form inputs */
+        label, input {
+            display: block;
+            margin-bottom: 10px;
+            color: black
+            ;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Details</h1>
+        <form id="userForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="fname">
+            <label for="email">Email:</label>
+            <input type="email" name="userEmail" id="email">
+
+            <label for="mobile">Contact:-</label>
+            <input type="tel" id="mobile" name="phone">
+
+            <button type="submit">Submit</button>
+        </form>
+        <ul id="listOfItems">
+        </ul>
+    </div>
+    <script>
+        // get the form element.
+        const userForm = document.getElementById('userForm');
+        const userList = document.getElementById('listOfItems');
+
+        // Add event listener to form submission
+        userForm.addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            event.preventDefault();
+
+            // Get user input values
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const mobile = document.getElementById('mobile').value;
+
+            // Create an object to store user data
+            const userData = {
+                name: name,
+                email: email,
+                mobile: mobile
+            };
+
+            // Store the user data object in local storage
+            localStorage.setItem('userData', JSON.stringify(userData));
+
+            // Call the function to display user data
+            showUserOnScreen(userData);
+
+            // Clear the form inputs after submission
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('mobile').value = '';
+        });
+
+        // To retrieve the data and parse it back to an object
+        function showUserOnScreen(object) {
+            // Create a new list item element
+            const listItem = document.createElement('li');
+            listItem.textContent = `${object.name} - ${object.email} - ${object.mobile}`;
+
+            // Append the new list item to the list
+            userList.appendChild(listItem);
+        }
+
+        // Retrieve stored data and display on page load
+        const storedData = localStorage.getItem('userData');
+        if (storedData) {
+            const parsedUserData = JSON.parse(storedData);
+            console.log(parsedUserData)
+        }
+            showUserOnScreen(parsedUserData);
+        
+    </script>
+</body>
+</html>
