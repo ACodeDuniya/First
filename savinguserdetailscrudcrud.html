@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Booking Appointment App</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Booking Appointment App</h1>
+    </header>
+    <section class="container">
+      <form id="my-form" onsubmit="saveToCrudCrud(event)">
+        <h1>Add User</h1>
+        <div class="msg"></div>
+        <div>
+          <label for="name">Name:</label>
+          <input id='username' type="text" name="username"  required/>
+        </div>
+
+        <div>
+          <label for="email">Email:</label>
+          <input id='email' type="email" name="emailId"  required/>
+        </div>
+        <div> 
+          <label> Phone Number</label>
+          <input id='phonenumber' type="tel" name="phonenumber" />
+        </div>
+
+        <button> Submit </button>
+      </form>
+
+      <ul id='listOfUsers'></ul>
+    
+    </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+    <script>
+        function saveToCrudCrud(event) {
+        event.preventDefault();
+        const name = event.target.username.value;
+        const email = event.target.emailId.value;
+        const phonenumber = event.target.phonenumber.value;
+        const obj = {
+            name,
+            email,
+            phonenumber
+        }
+        axios.post("https://crudcrud.com/api/3a286a2957114c869290ce4581733048/bookingappointment",obj)
+        .then((res) => {
+            console.log(res)
+        })
+        .catch((Err)=>{
+            console.log(Err)
+        });
+        showNewUserOnScreen(obj);
+    }
+
+
+
+    function showNewUserOnScreen(user){
+        document.getElementById('email').value = '';
+        document.getElementById('username').value = '';
+        document.getElementById('phonenumber').value ='';
+
+        const parentNode = document.getElementById('listOfUsers');
+        const childHTML = `<li id=${user.email}> ${user.name} - ${user.email}
+                                <button onclick=deleteUser('${user.email}')> Delete User </button>
+                                <button onclick=editUserDetails('${user.email}','${user.name}','${user.phonenumber}')>Edit User </button>
+                            </li>`
+
+        parentNode.innerHTML = parentNode.innerHTML + childHTML;
+    }
+
+
+
+    window.addEventListener("DOMContentLoaded", () => {
+        axios.get("https://crudcrud.com/api/3a286a2957114c869290ce4581733048/bookingappointment")
+        .then((response) => {
+            for(var i=0;i<response.data.length;i++){
+                showNewUserOnScreen(response.data[i]);
+            }
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+        }
+    )
+
+    </script>
+  </body>
+</html>
