@@ -3,65 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-    <title>Document</title>
+    <title>Seller's Admin Page</title>
 </head>
 <body>
-    <header id="main-header" class="bg-success text-white p-4 mb-3">
-        <div class="container">
-          <div class="row">
-            <div class="col-md-6">
-                <h1 id="header-title">Item Lister</h1>
-            </div>
-            <div class="col-md-6 align-self-center">
-                <input type="text" class="form-control" id="filter" placeholder="Search Items...">
-            </div>
-          </div>
-        </div>
-    </header>
-    <div class="container">
-    <div id="main" class="card card-body">
-    <h2 class="title">Add Items</h2>
-    <form id="addForm" class="form-inline mb-3">
-        <input type="text" class="form-control mr-2" id="item">
-        <input type="submit" class="btn btn-dark" value="Submit">
+    <form>
+        <label for="productSellingPrice">Selling Price : </label>
+        <input type="number" name="productSellingPrice" id="productSellingPrice">
+        <br><br>
+        <label for="productName">Product Name : </label>
+        <input type="text" name="productName" id="productName">
+        <br><br>
+        <button type="button" id="add-product-btn">Add Product</button>
     </form>
-    <h2 class="title">Items</h2>
-    <ul id="items" class="list-group">
-        <li class="list-group-item">Item 1 <button class="btn btn-danger btn-sm float-right delete">X</button></li>
-        <li class="list-group-item">Item 2 <button class="btn btn-danger btn-sm float-right delete">X</button></li>
-        <li class="list-group-item">Item 3 <button class="btn btn-danger btn-sm float-right delete">X</button></li>
-        <li class="list-group-item">Item 4 <button class="btn btn-danger btn-sm float-right delete">X</button></li>
-    </ul>
-    </div>
-    </div>
+    <h1>Products</h1>
+    <ul id="listOfProducts"></ul>
+    <h2>Total Value Worth of Products : Rs.
+    <label for="totalSellingPrice" id="totalSellingPrice"></label>
+    /- </h2>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
     <script>
-        // assignment-1
-        var itemList = document.getElementById('items');
-        itemList.addEventListener('click', removeItem);
-        
-        function removeItem(e){
-            if(e.target.classList.contains('delete')){
-                if(confirm('Are You Sure?')){
-                var li = e.target.parentElement;
-                itemList.removeChild(li);
+        const addProductBtn = document.getElementById("add-product-btn")
+        var totalSellingPrice = 0
+
+        addProductBtn.addEventListener("click", saveToCloud)
+
+        window.addEventListener("DOMContentLoaded", (obj) => {
+            axios.get("https://crudcrud.com/api/0687d64541c34457917f8bca310f215e/products")
+            .then((response) => {
+                for (var i = 0; i < response.data.length; i++) {
+                    showProductsOnScreen(response.data[i])
                 }
+            })
+        })
+
+        function saveToCloud(event) {
+            event.preventDefault()
+            const productName = document.getElementById("productName").value
+            const productSellingPrice = document.getElementById("productSellingPrice").value
+
+            const obj = {
+                productName,
+                productSellingPrice
             }
+
+            axios.post("https://crudcrud.com/api/0687d64541c34457917f8bca310f215e/products", obj)
+            .then((response) => showProductsOnScreen(response.data))
+            .catch((err) => {
+                document.body.innerHTML = document.body.innerHTML + "<h4> Something went wrong. </h4>"
+            })
+
+            document.getElementById("productSellingPrice").value = ""
+            document.getElementById("productName").value = ""
         }
 
-        // assignment-2
-        var editBtn = document.createElement("button");
-        editBtn.className = "btn btn-warning btn-sm float-right edit";
-        editBtn.appendChild(document.createTextNode("Edit"));
-
-        var listItems = document.querySelectorAll("ul#items .list-group-item");
-
-        listItems.forEach(function (item) {
-            var deleteButton = item.querySelector(".delete");
-            item.insertBefore(editBtn.cloneNode(true), deleteButton);
-        });
+        function showProductsOnScreen(obj) {
+            const parentElement = document.getElementById("listOfProducts")
+            const childElement = document.createElement("li")
+            childElement.textContent = obj.productSellingPrice + " - " + obj.productName + "            "
+            totalSellingPrice += Number(obj.productSellingPrice)
+            document.getElementById("totalSellingPrice").innerHTML = totalSellingPrice
 
 
+            const deleteButton = document.createElement("input")
+            deleteButton.type = "button"
+            deleteButton.value = "Delete"
+
+            childElement.appendChild(deleteButton)
+            parentElement.appendChild(childElement)
+
+            deleteButton.onclick = () => {
+                base_url = "https://crudcrud.com/api/0687d64541c34457917f8bca310f215e/products/"
+                axios.delete(base_url + obj._id)
+                parentElement.removeChild(childElement)
+                totalSellingPrice -= Number(obj.productSellingPrice)
+                document.getElementById("totalSellingPrice").innerHTML = totalSellingPrice
+            }
+        }
     </script>
 </body>
 </html>
